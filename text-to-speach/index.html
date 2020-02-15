@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Text to Speach</title>
+</head>
+
+<body>
+    <header>
+        Text to Voice
+    </header>
+    <section>
+        <select name="voiceOptions" id="voiceOptions"></select><br />
+        <input type="range" name="rate" id="range" max="3" min="0" step="0.1" value="1"><br />
+        <input type="range" name="pitch" id="pitch" max="2" min="0" step="0.1"><br />
+        <textarea name="text" id="text" cols="30" rows="10">Hello! How are you. I am fine Thanks</textarea>
+    </section>
+    <footer>
+        <button onclick="toggle(false)">Stop</button>
+        <button onclick="toggle()">Start</button>
+    </footer>
+
+    <script>
+        let voices = [];
+        const voiceDropdown = document.querySelector('#voiceOptions')
+        const range = document.querySelector('#range')
+        const pitch = document.querySelector('#pitch')
+        const options = document.querySelectorAll('[name="text"], [type="range"]')
+
+        const msg = new SpeechSynthesisUtterance;
+        msg.text = document.querySelector('#text').value
+
+        function populateVoices() {
+            voices = this.getVoices();
+            const voiceOptions = voices.map((v) => `<option value="${v.name}">${v.name} - ${v.lang}</option>`);
+            document.querySelector('#voiceOptions').innerHTML = voiceOptions;
+        }
+
+        function play() {
+            msg.voice = voices.find((v) => v.name === this.value);
+            toggle()
+        }
+
+        function toggle(speak = true) {
+            speechSynthesis.cancel();
+            if (speak)
+                speechSynthesis.speak(msg);
+        }
+
+        function setOptions() {
+            msg[this.name] = this.value;
+            toggle();
+        }
+
+        speechSynthesis.addEventListener('voiceschanged', populateVoices)
+        voiceDropdown.addEventListener('change', play)
+        options.forEach(option => option.addEventListener('change', setOptions))
+    </script>
+</body>
+
+</html>
